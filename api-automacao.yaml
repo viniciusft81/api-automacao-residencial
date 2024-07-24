@@ -1,0 +1,1140 @@
+openapi: '3.0.2'
+info:
+  title: API de uma Central de Automação Residencial
+  version: '1.0'
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: ambientes
+    description: Detalhes sobre os dispositivos em cada ambiente. 
+    externalDocs:
+      description: Veja mais detalhes em
+      url: https://localhost:8080/ambientes
+  - name: dispositivos
+    description: Detalhes sobre os dispositivos inteligentes.
+  - name: cenarios
+    description: Detalhes sobre os cenários possíveis para os dispositivos.
+  - name: lampadas
+    description: Detalhes sobre as lâmpadas.
+  - name: tv
+    description: Detalhes sobre as Tvs.
+  - name: sistemaSom
+    description: Detalhes sobre o sistema de som.
+  - name: arCondicionado
+    description: Detalhes sobre os ar condicionados.
+  - name: cortinas
+    description: Detalhes sobre as cortinas.
+  - name: portaoEletronico
+    description: Detalhes sobre os portões.
+         
+paths:
+  /ambientes:
+    get:
+      tags:
+        - ambientes
+      description: 'Obter uma lista dos ambientes cadastrados.'
+      operationId: findAll
+      responses:
+        '200':
+          $ref: "#/components/responses/AmbientesArray"
+    post: 
+      tags:
+        - ambientes
+      summary: Para cadastrar um novo ambiente
+      operationId: addComodo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                nome:
+                  type: string
+      responses:
+        "201":
+          description: Ambiente cadastrado com sucesso 
+        "405":
+          description: Entrada inválida
+  /ambientes/{idAmbiente}/dispositivos:
+    post: 
+      tags:
+        - ambientes
+      summary: Para cadastrar um novo dispositivo no comodo
+      operationId: addDispositivo
+      parameters:
+        - $ref: "#/components/parameters/nomeComodo"
+          schema:
+            type: string
+        - name: id
+          description: novo dispositivo a ser adicionado no ambiente
+          in: query  
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Dispositivo cadastrada com sucesso
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    nome:
+                      type: string
+                    dispositivos:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          nome: 
+                            type: string
+                          intensidade:
+                            type: string
+                          cor:
+                            type: string
+                          ligado:
+                            type: string
+        "405":
+          description: Entrada inválida
+    delete:
+      tags:
+        - ambientes
+      summary: Para excluir um dispositivo do ambiente 
+      operationId: deleteDispositivoAmbiente
+      parameters:
+        - $ref: "#/components/parameters/nomeComodo"
+          schema:
+            type: string
+        - name: id
+          description: dispositivo a ser excluido do ambiente
+          in: query  
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dispositivo excluído com sucesso do ambiente 
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: Ambiente não encontrado
+  /ambientes/{idAmbiente}:
+    get:
+      tags:
+        - ambientes
+      summary: Para obter os dispositivos cadastrados em um ambiente
+      description: Retorna um json representando um único comodo com os dispositivos cadastrados neste comodo.
+      operationId: findAmbiente
+      parameters:
+        - $ref: "#/components/parameters/nomeComodo"
+      responses:
+        "200":
+          $ref: "#/components/responses/EquipamentosArray"
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: ID não encontrado  
+    put:
+      tags:
+        - ambientes
+      summary: Para atualizar dados de um ambiente.
+      operationId: updateAmbiente
+      parameters:
+        - $ref: "#/components/parameters/nomeComodo"
+          schema:
+            type: string
+        - name: nome
+          description: novo nome do ambiente
+          in: query  
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    nome:
+                      type: string
+                    dispositivos:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          nome: 
+                            type: string
+                          intensidade:
+                            type: string
+                          cor:
+                            type: string
+                          ligado:
+                            type: string
+                          
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: Ambiente não encontrado
+        "405":
+          description: Entrada inválida
+    delete:
+      tags:
+        - ambientes
+      summary: Para excluir um ambiente 
+      operationId: deleteAmbiente
+      parameters:
+        - $ref: "#/components/parameters/nomeComodo"
+      responses:
+        "200":
+          description: Ambiente excluído com sucesso 
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: Ambiente não encontrado
+  /dispositivos:
+    get:
+      tags:
+        - dispositivos
+      description: 'Obter uma lista de todos os dispositivos.'
+      operationId: findAll
+      responses:
+        '200':
+          $ref: "#/components/responses/DispositivosArray"
+  /dispositivos/{idDispositivo}:
+    get:
+      tags:
+        - dispositivos
+      description: 'Obter detalhes de um único dispositivos.'
+      operationId: findDisp
+      parameters:
+        - $ref: "#/components/parameters/idEquipamento"
+      responses:
+        '200':
+          $ref: "#/components/responses/Lampadas"
+
+  /dispositivos/lampadas:
+    get:
+      tags:
+        - lampadas
+      description: 'Obter uma lista de todas as lâmpadas.'
+      operationId: findAll
+      responses:
+        '200':
+          $ref: "#/components/responses/LampadaArray"
+  /dispositivos/lampadas/{idLampada}:
+    get: 
+      tags:
+        - lampadas
+      summary: Para obter informações de uma única lâmpada.
+      operationId: findLampada
+      parameters:
+        - $ref: "#/components/parameters/idLampada"
+      responses:
+        '200':
+          $ref: "#/components/responses/Lampadas"
+    put:
+      tags:
+        - lampadas
+      summary: Para atualizar dados de uma lâmpada.
+      operationId: updateLampada
+      parameters:
+        - $ref: "#/components/parameters/idLampada"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                ligado:
+                  type: boolean
+                intensidade: 
+                  type: integer
+                cor:
+                  type: string
+      responses:
+        "200":
+          description: Dados da lâmpada atualizado com sucesso 
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: Lâmpada não encontrada
+        "405":
+          description: Entrada inválida
+  /dispositivos/tv:
+    get:
+      tags:
+        - tv
+      description: 'Obter uma lista de todas as Tvs.'
+      operationId: findAll
+      responses:
+        '200':
+          $ref: "#/components/responses/TvArray"
+  /dispositivos/tv/{idTv}:
+    get: 
+      tags:
+        - tv
+      summary: Para obter informações de uma única tv.
+      operationId: findTv
+      parameters:
+        - $ref: "#/components/parameters/idTv"
+      responses:
+        '200':
+          $ref: "#/components/responses/Tv"
+    put:
+      tags:
+        - tv
+      summary: Para atualizar dados de uma Tv.
+      operationId: updateLampada
+      parameters:
+        - $ref: "#/components/parameters/idTv"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                ligado:
+                  type: boolean
+                canal:
+                  type: integer
+                volume:
+                  type: integer
+      responses:
+        "200":
+          description: Dados da Tv atualizado com sucesso 
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: Tv não encontrada
+        "405":
+          description: Entrada inválida
+  /dispositivos/sistemaSom:
+    get:
+      tags:
+        - sistemaSom
+      description: 'Obter uma lista de todos os sistemas de som.'
+      operationId: findAll
+      responses:
+        '200':
+          $ref: "#/components/responses/SistemaSomArray"
+  /dispositivos/sistemaSom/{idSistemaSom}:
+    get: 
+      tags:
+        - sistemaSom
+      summary: Para obter informações de um único sistema de som.
+      operationId: findSom
+      parameters:
+        - $ref: "#/components/parameters/idSistemaSom"
+      responses:
+        '200':
+          $ref: "#/components/responses/SistemaSom"
+    put:
+      tags:
+        - sistemaSom
+      summary: Para atualizar dados de um sistema de som.
+      operationId: updateSom
+      parameters:
+        - $ref: "#/components/parameters/idSistemaSom"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                ligado:
+                  type: boolean
+                volume: 
+                  type: integer
+      responses:
+        "200":
+          description: Dados do sistema de som atualizado com sucesso 
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: Sistema de som não encontrado
+        "405":
+          description: Entrada inválida
+  /dispositivos/arCondicionado:
+    get:
+      tags:
+        - arCondicionado
+      description: 'Obter uma lista de todos os ar condicionados.'
+      operationId: findAll
+      responses:
+        '200':
+          $ref: "#/components/responses/ArCondicionadoArray"
+  /dispositivos/arCondicionado/{idArCondicionado}:
+    get: 
+      tags:
+        - arCondicionado
+      summary: Para obter informações de um único ar condicionado.
+      operationId: findArCondicionado
+      parameters:
+        - $ref: "#/components/parameters/idArCondicionado"
+      responses:
+        '200':
+          $ref: "#/components/responses/ArCondicionado"
+    put:
+      tags:
+        - arCondicionado
+      summary: Para atualizar dados de um ar condicionado.
+      operationId: updateArCondicionado
+      parameters:
+        - $ref: "#/components/parameters/idArCondicionado"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                ligado:
+                  type: boolean
+                temperatura: 
+                  type: integer
+      responses:
+        "200":
+          description: Dados do ar condicionado atualizado com sucesso 
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: Ar condicionado não encontrado
+        "405":
+          description: Entrada inválida
+  /dispositivos/cortinas:
+    get:
+      tags:
+        - cortinas
+      description: 'Obter uma lista de todas as cortinas.'
+      operationId: findAll
+      responses:
+        '200':
+          $ref: "#/components/responses/CortinasArray"
+  /dispositivos/cortinas/{idCortina}:
+    get: 
+      tags:
+        - cortinas
+      summary: Para obter informações de uma única cortina.
+      operationId: findCortina
+      parameters:
+        - $ref: "#/components/parameters/idCortina"
+      responses:
+        '200':
+          $ref: "#/components/responses/Cortinas"
+    put:
+      tags:
+        - cortinas
+      summary: Para atualizar dados de uma cortina.
+      operationId: updateCortina
+      parameters:
+        - $ref: "#/components/parameters/idCortina"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                aberto: 
+                  type: boolean
+      responses:
+        "200":
+          description: Dados da cortina atualizado com sucesso 
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: Cortina não encontrado
+        "405":
+          description: Entrada inválida
+  /dispositivos/portoes:
+    get:
+      tags:
+        - portaoEletronico
+      description: 'Obter uma lista de todos os portões eletrônicos.'
+      operationId: findAll
+      responses:
+        '200':
+          $ref: "#/components/responses/PortaoArray"
+  /dispositivos/portoes/{idPortao}:
+    get: 
+      tags:
+        - portaoEletronico
+      summary: Para obter informações de um único portão.
+      operationId: findPortao
+      parameters:
+        - $ref: "#/components/parameters/idPortao"
+      responses:
+        '200':
+          $ref: "#/components/responses/PortaoEletronico"
+    put:
+      tags:
+        - portaoEletronico
+      summary: Para atualizar dados de um portão.
+      operationId: updatePortao
+      parameters:
+        - $ref: "#/components/parameters/idPortao"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                aberto: 
+                  type: boolean
+      responses:
+        "200":
+          description: Dados do portão atualizado com sucesso 
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: Portão não encontrado
+        "405":
+          description: Entrada inválida
+  /cenarios:
+    get:
+      tags:
+        - cenarios
+      summary: Listar todos os cenarios da casa
+      description: 'Obter uma lista de todos os cenários.'
+      operationId: findAll
+      responses:
+        '200':
+          $ref: "#/components/responses/CenariosArray"
+    post:
+      tags:
+        - cenarios
+      summary: Para cadastrar um novo cenário
+      operationId: addCenario
+      responses:
+        "201":
+          description: Cenário cadastrado com sucesso 
+        "405":
+          description: Entrada inválida
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                nome_cenario:
+                  type: string
+                inicio:
+                  type: string
+                fim:
+                  type: string
+  /cenarios/{nomeCenario}:
+    get:
+      tags:
+        - cenarios
+      summary: Para obter detalhes de um cenário e os dispositivos cadastrados
+      description: Retorna um json representando um único cenário com os dispositivos cadastrados.
+      operationId: findCenario
+      parameters:
+        - $ref: "#/components/parameters/nomeCenario"
+      responses:
+        "200":
+          description: OK
+          content: 
+            application/json:
+              schema:
+                properties:
+                  nome_cenario: 
+                    type: string
+                  inicio:
+                    type: string
+                  fim: 
+                    type: string
+                  dispositivos:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Dispositivo"
+        "400":  
+          description: ID fornecido é inválido
+        "404":
+          description: ID não encontrado
+    put:
+      tags:
+        - cenarios
+      summary: Para atualizar dados de um cenário.
+      operationId: updateCenario
+      parameters:
+        - $ref: "#/components/parameters/nomeCenario"
+        - name: nome
+          description: novo nome do cenário
+          in: query  
+          required: true
+          schema:
+            type: string
+        - name: inicio
+          description: identificador do inicio do cenário
+          in: query  
+          required: true
+          schema:
+            type: string
+        - name: fim
+          description: identificador do fim do cenário
+          in: query  
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Dados do cenário atualizado com sucesso 
+          content:
+            application/json:
+              schema:
+                properties:
+                  nome:
+                    type: string
+                  inicio: 
+                    type: string
+                  fim:
+                    type: string
+                  dispositivos:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Lampada"
+        "400":
+          description: Nome do cenário fornecido é inválido
+        "404":
+          description: Cenário não encontrado
+        "405":
+          description: Entrada inválida
+    delete:
+      tags:
+        - cenarios
+      summary: Para excluir um cenário 
+      operationId: deleteCenario
+      parameters:
+        - $ref: "#/components/parameters/nomeCenario"
+      responses:
+        "200":
+          description: Cenário excluído com sucesso 
+        "400":
+          description: Nome do cenário fornecido fornecido é inválido
+        "404":
+          description: Cenário não encontrado
+  /cenarios/{nomeCenario}/dispositivos:
+    post: 
+      tags:
+        - cenarios
+      summary: Para adicionar um dispositivo no cenário
+      operationId: addDispositivo
+      parameters:
+        - $ref: "#/components/parameters/nomeCenario"
+        - name: id
+          description: identificador do dispositivo a ser adicionado no cenário
+          in: query  
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Dispositivo adicionado ao cenário com sucesso 
+          content:
+            application/json:
+              schema:
+                properties:
+                  nome:
+                    type: string
+                  inicio:
+                    type: string
+                  fim:
+                    type: string
+                  dispositivos:
+                    type: array
+                  items:
+                    $ref: "#/components/schemas/Lampada"
+        "405":
+          description: Entrada inválida
+    delete:
+      tags:
+        - cenarios
+      summary: Para excluir um dispositivo do cenário 
+      operationId: deleteDispositivoCenario
+      parameters:
+        - $ref: "#/components/parameters/nomeCenario"
+          schema:
+            type: string
+        - name: id
+          description: dispositivo a ser excluido do cenário
+          in: query  
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dispositivo excluído com sucesso do cenário 
+        "400":
+          description: ID fornecido é inválido
+        "404":
+          description: Ambiente não encontrado
+
+components:
+  schemas:
+    Ambientes: 
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+    Dispositivo:
+      type: object
+      properties:
+      $ref: "#/components/schemas/Tv"
+          
+    Lampada:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        ligado:
+          type: boolean
+        intensidade: 
+          type: integer
+        cor:
+          type: string
+    Tv:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        ligado:
+          type: boolean
+        canal:
+          type: integer
+        volume:
+          type: integer
+    SistemaSom:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        ligado:
+          type: boolean
+        volume: 
+          type: integer
+    ArCondicionado:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        ligado:
+          type: boolean
+        temperatura: 
+          type: integer
+    Cortinas:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        aberto:
+          type: boolean
+    PortaoEletronico:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        aberto:
+          type: boolean
+    Cenarios:
+      type: object
+      properties:
+        nome_cenario: 
+          type: string
+        inicio:
+          type: string
+        fim: 
+          type: string
+
+  parameters:
+    nomeComodo:
+      description: identificador de um ambiente
+      name: idAmbiente
+      in: path 
+      required: true
+      schema:
+        type: integer
+    nomeCenario:
+      description: identificador de um cenário
+      name: nomeCenario
+      in: path 
+      required: true
+      schema:
+        type: string
+    idEquipamento:
+      description: identificador de um dispositivo
+      name: idDispositivo 
+      in: path 
+      required: true
+      schema:
+        type: integer
+        format: int64
+    idLampada:
+      description: identificador de uma lâmpada
+      name: idLampada
+      in: path 
+      required: true
+      schema:
+        type: integer
+        format: int64
+    idTv:
+      description: identificador de uma Tv
+      name: idTv
+      in: path 
+      required: true
+      schema:
+        type: integer
+        format: int64
+    idSistemaSom:
+      description: identificador de um sistema de som
+      name: idSistemaSom
+      in: path 
+      required: true
+      schema:
+        type: integer
+        format: int64
+    idArCondicionado:
+      description: identificador de um ar condicionado
+      name: idArCondicionado
+      in: path 
+      required: true
+      schema:
+        type: integer
+        format: int64
+    idCortina:
+      description: identificador de uma cortina
+      name: idCortina
+      in: path 
+      required: true
+      schema:
+        type: integer
+        format: int64
+    idPortao:
+      description: identificador de um portão eletrônico
+      name: idPortao
+      in: path 
+      required: true
+      schema:
+        type: integer
+        format: int64
+  
+  requestBodies:
+    Ambientes:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Ambientes"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/Ambientes"
+    Dispositivos:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Dispositivo"
+    Lampadas:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Lampada"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/Lampada"
+    Tv:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Tv"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/Tv"
+    SistemaSom:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SistemaSom"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/SistemaSom"
+    ArCondicionado:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ArCondicionado"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/ArCondicionado"
+    Cortinas:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Cortinas"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/Cortinas"
+    PortaoEletronico:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PortaoEletronico"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/PortaoEletronico"
+  responses:
+    Dispositivos: 
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Dispositivo"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/Dispositivo"
+    DispositivosArray:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Dispositivo"
+    Lampadas: 
+      description: OK 
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Lampada"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/Lampada"
+    Tv: 
+      description: OK 
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Tv"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/Tv"
+    SistemaSom: 
+      description: OK 
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SistemaSom"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/SistemaSom"
+    ArCondicionado: 
+      description: OK 
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ArCondicionado"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/ArCondicionado"
+    Cortinas: 
+      description: OK 
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Cortinas"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/Cortinas"
+    PortaoEletronico: 
+      description: OK 
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PortaoEletronico"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/PortaoEletronico"
+    AmbientesArray:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Ambientes"
+        application/xml:
+          schema:
+            type: array
+            xml: 
+              name: comodo
+              wrapped: false
+            items:
+              $ref: "#/components/schemas/Ambientes"
+    CenariosArray:
+      description: OK
+      content: 
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Cenarios"
+    Cenario:
+      description: OK
+      
+    EquipamentosArray:
+      description: OK
+      content:
+        application/json:
+          schema:
+            properties:
+                id:
+                  type: integer
+                nome:
+                  type: string
+                dispositivos:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Dispositivo"
+    Equipamentos:
+      description: OK
+      content:
+        application/json:
+          schema:
+            properties:
+              dispositivos:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lampada"
+    LampadaArray:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Lampada"
+        application/xml:
+          schema:
+            type: array
+            xml: 
+              name: lampada
+              wrapped: false
+            items:
+              $ref: "#/components/schemas/Lampada"
+    TvArray:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Tv"
+        application/xml:
+          schema:
+            type: array
+            xml: 
+              name: tv
+              wrapped: false
+            items:
+              $ref: "#/components/schemas/Tv"
+    SistemaSomArray:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/SistemaSom"
+        application/xml:
+          schema:
+            type: array
+            xml: 
+              name: som
+              wrapped: false
+            items:
+              $ref: "#/components/schemas/SistemaSom"
+    ArCondicionadoArray:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/ArCondicionado"
+        application/xml:
+          schema:
+            type: array
+            xml: 
+              name: arcondicionado
+              wrapped: false
+            items:
+              $ref: "#/components/schemas/ArCondicionado"
+    CortinasArray:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Cortinas"
+        application/xml:
+          schema:
+            type: array
+            xml: 
+              name: cortina
+              wrapped: false
+            items:
+              $ref: "#/components/schemas/Cortinas"
+    PortaoArray:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/PortaoEletronico"
+        application/xml:
+          schema:
+            type: array
+            xml: 
+              name: portao
+              wrapped: false
+            items:
+              $ref: "#/components/schemas/PortaoEletronico"
